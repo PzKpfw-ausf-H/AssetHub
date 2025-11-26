@@ -1,18 +1,25 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from config import Config
+import os
+
+# создаём объект БД, но пока без привязки к приложению
+db = SQLAlchemy()
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-from app.controllers.assets import assets_bp  # noqa: E402
+# гарантируем, что папка для файлов существует
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
+# инициализируем БД с приложением
+db.init_app(app)
+
+from app.controllers.assets import assets_bp
 app.register_blueprint(assets_bp)
 
 
-# Можно добавить простой маршрут для /
 @app.route("/")
 def index():
-    # просто редирект или заглушка — пока редирект в /assets сделаем позже,
-    # сейчас пусть возвращает текст
     return "AssetHub backend is running. Go to /assets"
 
