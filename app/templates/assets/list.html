@@ -1,0 +1,17 @@
+<!-- app/templates/assets/list.html -->
+ <!-- пустой список пока что -->
+{% extends "base.html" %}
+
+{% block title %}Список ассетов — AssetHub{% endblock %}
+
+{% block content %}
+<h2>Список ассетов (пока фейковые данные)</h2>
+
+<ul>
+    {% for asset in assets %}
+        <li>
+            [{{ asset.type }}] {{ asset.title }} (id: {{ asset.id }})
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

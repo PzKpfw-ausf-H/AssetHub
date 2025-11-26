@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: assethub-db
+    environment:
+      POSTGRES_DB: assethub
+      POSTGRES_USER: assetuser
+      POSTGRES_PASSWORD: assetpass
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"    # можно не пробрасывать наружу, если не нужно
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U assetuser -d assethub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: assethub-web
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # строка подключения для SQLAlchemy
+      DATABASE_URL: postgresql+psycopg2://assetuser:assetpass@db:5432/assethub
+      # сюда можно добавить другие настройки (секреты, режим debug и т.п.)
+    ports:
+      - "8000:8000"   # http://localhost:8000 — наш сайт
+    volumes:
+      - .:/app        # для удобной разработки (hot reload, если захотим)
+      - assets_storage:/app/storage  # папка для файлов ассетов
+
+volumes:
+  db_data:
+  assets_storage:

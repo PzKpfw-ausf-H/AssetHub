@@ -1,0 +1,11 @@
+/* app/static/css/styles.css */
+/* самый минимальный чтобы ничего не ругалось */
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 20px;
+}
+
+header h1 {
+    margin-bottom: 0.5rem;
+}

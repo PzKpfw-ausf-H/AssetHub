@@ -1,0 +1,27 @@
+<!-- app/templates/base.html -->
+ <!-- Базовый шаблон от которого будем потом наследоваться -->
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}AssetHub{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+<header>
+    <h1>AssetHub — база концепт-арта и 3D-моделей</h1>
+    <nav>
+        <a href="/">Главная</a> |
+        <a href="{{ url_for('assets.assets_list') }}">Ассеты</a>
+        <!-- позже добавим теги, загрузка, о системе -->
+    </nav>
+    <hr>
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
