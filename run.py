@@ -1,5 +1,5 @@
 from app import app, db
-from app.models import Asset, Tag  # чтобы модели были известны
+from app.models import Asset, Tag
 
 def seed_data():
     if Asset.query.first():

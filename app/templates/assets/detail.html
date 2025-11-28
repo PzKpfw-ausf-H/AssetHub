@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}{{ asset.title }} — AssetHub{% endblock %}
+
+{% block content %}
+<h2>{{ asset.title }}</h2>
+
+<p><b>Тип:</b> {{ asset.asset_type }}</p>
+<p><b>Проект:</b> {{ asset.project_name or "—" }}</p>
+<p><b>Автор:</b> {{ asset.author_name or "—" }}</p>
+<p><b>Создан:</b> {{ asset.created_at or "—" }}</p>
+
+{% if asset.description %}
+    <p><b>Описание:</b> {{ asset.description }}</p>
+{% endif %}
+
+<hr>
+
+<p><b>Путь к файлу (в БД):</b> {{ asset.file_path }}</p>
+<p><i>Позже здесь сделаем кнопку «Скачать ассет».</i></p>
+
+<p><a href="{{ url_for('assets.assets_list') }}">← Назад к списку ассетов</a></p>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Загрузка ассета — AssetHub{% endblock %}
+
+{% block content %}
+<h2>Загрузка нового ассета</h2>
+
+{% if errors %}
+    <div style="color: red;">
+        <ul>
+        {% for e in errors %}
+            <li>{{ e }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<form action="{{ url_for('assets.upload_asset') }}" method="post" enctype="multipart/form-data">
+    <p>
+        <label>Название ассета:<br>
+            <input type="text" name="title" value="{{ form.title if form is defined else '' }}">
+        </label>
+    </p>
+
+    <p>
+        <label>Описание:<br>
+            <textarea name="description" rows="4" cols="40">{{ form.description if form is defined else '' }}</textarea>
+        </label>
+    </p>
+
+    <p>
+        <label>Тип ассета:<br>
+            <select name="asset_type">
+                {% set current_type = form.asset_type if form is defined else '' %}
+                <option value="">— выберите тип —</option>
+                <option value="concept" {{ 'selected' if current_type == 'concept' else '' }}>Концепт-арт</option>
+                <option value="3d_model" {{ 'selected' if current_type == '3d_model' else '' }}>3D-модель</option>
+                <option value="texture" {{ 'selected' if current_type == 'texture' else '' }}>Текстура</option>
+                <option value="other" {{ 'selected' if current_type == 'other' else '' }}>Другое</option>
+            </select>
+        </label>
+    </p>
+
+    <p>
+        <label>Проект:<br>
+            <input type="text" name="project_name" value="{{ form.project_name if form is defined else '' }}">
+        </label>
+    </p>
+
+    <p>
+        <label>Автор:<br>
+            <input type="text" name="author_name" value="{{ form.author_name if form is defined else '' }}">
+        </label>
+    </p>
+
+    <p>
+        <label>Файл ассета:<br>
+            <input type="file" name="file">
+        </label>
+    </p>
+
+    <p>
+        <button type="submit">Загрузить</button>
+        <a href="{{ url_for('assets.assets_list') }}">Отмена</a>
+    </p>
+</form>
+{% endblock %}
