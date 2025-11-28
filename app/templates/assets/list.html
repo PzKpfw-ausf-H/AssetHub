@@ -3,8 +3,14 @@
 {% block title %}Список ассетов — AssetHub{% endblock %}
 
 {% block content %}
-<h2>Список ассетов</h2>
 
+<h2>Список ассетов</h2>
+{% if tag_filter %}
+    <p>
+        Фильтр по тегу: <b>{{ tag_filter }}</b>
+        (<a href="{{ url_for('assets.assets_list') }}">сбросить</a>)
+    </p>
+{% endif %}
 <table border="1" cellpadding="8" cellspacing="0">
     <thead>
     <tr>

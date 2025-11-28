@@ -60,6 +60,12 @@
     </p>
 
     <p>
+        <label>Теги (через запятую):<br>
+            <input type="text" name="tags" value="{{ form.tags if form is defined else '' }}">
+        </label>
+    </p>
+
+    <p>
         <button type="submit">Загрузить</button>
         <a href="{{ url_for('assets.assets_list') }}">Отмена</a>
     </p>

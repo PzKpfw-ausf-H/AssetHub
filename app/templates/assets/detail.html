@@ -7,12 +7,21 @@
 
 <p><b>Тип:</b> {{ asset.asset_type }}</p>
 <p><b>Проект:</b> {{ asset.project_name or "—" }}</p>
+{% if asset.tags %}
+    <p><b>Теги:</b>
+        {% for tag in asset.tags %}
+            <a href="{{ url_for('assets.assets_list', tag=tag.name) }}">{{ tag.name }}</a>
+            {% if not loop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+{% endif %}
 <p><b>Автор:</b> {{ asset.author_name or "—" }}</p>
 <p><b>Создан:</b> {{ asset.created_at or "—" }}</p>
 
 {% if asset.description %}
     <p><b>Описание:</b> {{ asset.description }}</p>
 {% endif %}
+
 
 <hr>
 

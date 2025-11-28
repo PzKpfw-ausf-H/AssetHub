@@ -1,17 +1,31 @@
 # app/controllers/assets.py
 from flask import Blueprint, render_template, abort, current_app, request, redirect, url_for, flash
-from app.models import Asset
+from app.models import Asset, Tag, AssetTag
 import os
 import uuid
 from werkzeug.utils import secure_filename
+from sqlalchemy.orm import joinedload
 
 assets_bp = Blueprint("assets", __name__, url_prefix="/assets")
 
 
 @assets_bp.route("/")
+@assets_bp.route("/")
 def assets_list():
-    assets = Asset.query.order_by(Asset.created_at.desc()).all()
-    return render_template("assets/list.html", assets=assets)
+    tag_filter = request.args.get("tag")
+
+    if tag_filter:
+        assets = (
+            Asset.query
+            .join(Asset.tags)
+            .filter(Tag.name == tag_filter)
+            .order_by(Asset.created_at.desc())
+            .all()
+        )
+    else:
+        assets = Asset.query.order_by(Asset.created_at.desc()).all()
+
+    return render_template("assets/list.html", assets=assets, tag_filter=tag_filter)
 
 @assets_bp.route("/<int:asset_id>")
 def asset_detail(asset_id):
@@ -40,6 +54,7 @@ def upload_asset():
     asset_type = request.form.get("asset_type", "").strip()
     project_name = request.form.get("project_name", "").strip()
     author_name = request.form.get("author_name", "").strip()
+    tags_raw = request.form.get("tags", "").strip()
 
     file = request.files.get("file")
 
@@ -92,6 +107,26 @@ def upload_asset():
     )
 
     db.session.add(asset)
+
+    # обрабатываем теги
+    tags_list = []
+    if tags_raw:
+        # разбиваем по запятой, убираем пробелы
+        tags_list = [t.strip().lower() for t in tags_raw.split(",") if t.strip()]
+
+    # для каждого тега берём существующий или создаём новый
+    asset_tags = []
+    for tag_name in tags_list:
+        tag = Tag.query.filter_by(name=tag_name).first()
+        if not tag:
+            tag = Tag(name=tag_name)
+            db.session.add(tag)
+            db.session.flush()
+        asset_tags.append(tag)
+
+    asset.tags = asset_tags
+
+
     db.session.commit()
 
     # после добавления редиректит на страницу ассета
