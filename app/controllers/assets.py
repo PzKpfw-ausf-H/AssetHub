@@ -1,31 +1,73 @@
 # app/controllers/assets.py
-from flask import Blueprint, render_template, abort, current_app, request, redirect, url_for, flash
+from flask import Blueprint, render_template, abort, current_app, request, redirect, url_for, send_file
 from app.models import Asset, Tag, AssetTag
 import os
 import uuid
 from werkzeug.utils import secure_filename
 from sqlalchemy.orm import joinedload
+from app import db
+
+
 
 assets_bp = Blueprint("assets", __name__, url_prefix="/assets")
 
-
-@assets_bp.route("/")
 @assets_bp.route("/")
 def assets_list():
     tag_filter = request.args.get("tag")
+    q = request.args.get("q", "").strip()
 
+    query = Asset.query
+
+    #фильтр по тегу (если есть)
     if tag_filter:
-        assets = (
-            Asset.query
+        query = (
+            query
             .join(Asset.tags)
             .filter(Tag.name == tag_filter)
-            .order_by(Asset.created_at.desc())
-            .all()
         )
-    else:
-        assets = Asset.query.order_by(Asset.created_at.desc()).all()
 
-    return render_template("assets/list.html", assets=assets, tag_filter=tag_filter)
+    #текстовый поиск (если есть q)
+    if q:
+        like = f"%{q}%"
+        query = query.filter(
+            db.or_(
+                Asset.title.ilike(like),
+                Asset.description.ilike(like),
+                Asset.project_name.ilike(like),
+                Asset.author_name.ilike(like),
+            )
+        )
+
+    assets = query.order_by(Asset.created_at.desc()).all()
+
+    return render_template(
+        "assets/list.html",
+        assets=assets,
+        tag_filter=tag_filter,
+        q=q,
+    )
+
+
+#скачивание ассета
+@assets_bp.route("/<int:asset_id>/download")
+def download_asset(asset_id):
+    asset = Asset.query.get(asset_id)
+    if asset is None:
+        abort(404)
+
+    # относительный путь из бд
+    file_path = asset.file_path
+    if not file_path:
+        abort(404)
+
+    #абсолютный путь внутри проекта
+    abs_path = os.path.abspath(file_path)
+
+    if not os.path.exists(abs_path):
+        abort(404)
+
+    return send_file(abs_path, as_attachment=True)
+
 
 @assets_bp.route("/<int:asset_id>")
 def asset_detail(asset_id):

@@ -5,12 +5,28 @@
 {% block content %}
 
 <h2>Список ассетов</h2>
+
+<form action="{{ url_for('assets.assets_list') }}" method="get">
+    {% if tag_filter %}
+        <input type="hidden" name="tag" value="{{ tag_filter }}">
+    {% endif %}
+    <label>
+        Поиск:
+        <input type="text" name="q" value="{{ q or '' }}">
+    </label>
+    <button type="submit">Найти</button>
+    {% if q %}
+        <a href="{{ url_for('assets.assets_list', tag=tag_filter) }}">Сбросить поиск</a>
+    {% endif %}
+</form>
+
 {% if tag_filter %}
     <p>
         Фильтр по тегу: <b>{{ tag_filter }}</b>
-        (<a href="{{ url_for('assets.assets_list') }}">сбросить</a>)
+        (<a href="{{ url_for('assets.assets_list') }}">сбросить все фильтры</a>)
     </p>
 {% endif %}
+
 <table border="1" cellpadding="8" cellspacing="0">
     <thead>
     <tr>

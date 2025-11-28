@@ -26,7 +26,12 @@
 <hr>
 
 <p><b>Путь к файлу (в БД):</b> {{ asset.file_path }}</p>
-<p><i>Позже здесь сделаем кнопку «Скачать ассет».</i></p>
+<p>
+    <a href="{{ url_for('assets.download_asset', asset_id=asset.id) }}">
+        Скачать ассет
+    </a>
+</p>
+
 
 <p><a href="{{ url_for('assets.assets_list') }}">← Назад к списку ассетов</a></p>
 {% endblock %}

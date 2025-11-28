@@ -11,7 +11,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"    # можно не пробрасывать наружу, если не нужно
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U assetuser -d assethub"]
       interval: 10s
@@ -27,14 +27,12 @@ services:
       db:
         condition: service_healthy
     environment:
-      # строка подключения для SQLAlchemy
       DATABASE_URL: postgresql+psycopg2://assetuser:assetpass@db:5432/assethub
-      # сюда можно добавить другие настройки (секреты, режим debug и т.п.)
     ports:
-      - "8000:8000"   # http://localhost:8000 — наш сайт
+      - "8000:8000"
     volumes:
-      - .:/app        # для удобной разработки (hot reload, если захотим)
-      - assets_storage:/app/storage  # папка для файлов ассетов
+      - .:/app
+      - assets_storage:/app/storage
 
 volumes:
   db_data:
