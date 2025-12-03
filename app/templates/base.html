@@ -1,28 +1,68 @@
-<!-- app/templates/base.html -->
- <!-- Базовый шаблон от которого будем потом наследоваться -->
 <!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <title>{% block title %}AssetHub{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <!-- Bootstrap 5 для лучшего ui, отступов, таблиц и тд -->
+    <link 
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+        rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .asset-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
+
+    {% block head %}{% endblock %}
 </head>
+
 <body>
-<header>
-    <h1>AssetHub — база концепт-арта и 3D-моделей</h1>
-    <nav>
-        <a href="/">Главная</a> |
-        <a href="{{ url_for('assets.assets_list') }}">Ассеты</a> |
-        <a href="{{ url_for('tags.tags_list') }}">Теги</a> |
-        <a href="{{ url_for('assets.upload_form') }}">Загрузка ассета</a>
-    </nav>
-    <hr>
-</header>
 
-<main>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="/">AssetHub</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+            data-bs-target="#navbarNav" aria-controls="navbarNav" 
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('assets.assets_list') }}">Ассеты</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('tags.tags_list') }}">Теги</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('assets.upload_form') }}">
+            Загрузка
+          </a>
+        </li>
+
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+<div class="container">
     {% block content %}{% endblock %}
-</main>
+</div>
 
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

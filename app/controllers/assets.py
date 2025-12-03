@@ -12,21 +12,25 @@ from app import db
 assets_bp = Blueprint("assets", __name__, url_prefix="/assets")
 
 @assets_bp.route("/")
+@assets_bp.route("/")
 def assets_list():
+
     tag_filter = request.args.get("tag")
+    author_filter = request.args.get("author")
     q = request.args.get("q", "").strip()
+    sort = request.args.get("sort", "new")
 
     query = Asset.query
 
-    #фильтр по тегу (если есть)
+    # фильтр по тегу
     if tag_filter:
-        query = (
-            query
-            .join(Asset.tags)
-            .filter(Tag.name == tag_filter)
-        )
+        query = query.join(Asset.tags).filter(Tag.name == tag_filter)
 
-    #текстовый поиск (если есть q)
+    # фильтр по автору
+    if author_filter:
+        query = query.filter(Asset.author_name == author_filter)
+
+    # текстовый поиск
     if q:
         like = f"%{q}%"
         query = query.filter(
@@ -38,14 +42,41 @@ def assets_list():
             )
         )
 
-    assets = query.order_by(Asset.created_at.desc()).all()
+    if sort == "old":
+        query = query.order_by(Asset.created_at.asc())
+    elif sort == "title":
+        query = query.order_by(Asset.title.asc())
+    elif sort == "author":
+        query = query.order_by(Asset.author_name.asc())
+    else:
+        query = query.order_by(Asset.created_at.desc())
+
+    assets = query.all()
+
+    # авторы для фильтра
+    authors_rows = (
+        db.session.query(Asset.author_name)
+        .filter(Asset.author_name.isnot(None))
+        .distinct()
+        .order_by(Asset.author_name.asc())
+        .all()
+    )
+    all_authors = [row[0] for row in authors_rows]
+
+    # теги для фильтра
+    all_tags = Tag.query.order_by(Tag.name).all()
 
     return render_template(
         "assets/list.html",
         assets=assets,
         tag_filter=tag_filter,
+        author_filter=author_filter,
         q=q,
+        sort=sort,
+        all_authors=all_authors,
+        all_tags=all_tags,
     )
+
 
 
 #скачивание ассета
@@ -125,7 +156,7 @@ def upload_asset():
             },
         )
 
-    # Сохраняем файл
+    # сохраняем файл
     original_name = secure_filename(file.filename)
     unique_name = f"{uuid.uuid4().hex}_{original_name}"
     folder = current_app.config["UPLOAD_FOLDER"]
@@ -134,7 +165,7 @@ def upload_asset():
     file_path = os.path.join(folder, unique_name)
     file.save(file_path)
 
-    # Путь, который будем хранить в БД
+    # путь, который будем хранить в БД
     db_path = f"{folder}/{unique_name}"
 
     from app import db

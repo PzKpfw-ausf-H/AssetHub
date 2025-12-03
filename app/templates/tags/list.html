@@ -1,14 +1,20 @@
 {% extends "base.html" %}
+{% block title %}Теги — AssetHub{% endblock %}
 
 {% block content %}
-<h2>Все теги</h2>
+<h1 class="mb-4">Теги</h1>
 
-<ul>
-{% for tag in tags %}
-    <li>
-        <a href="{{ url_for('assets.assets_list', tag=tag.name) }}">{{ tag.name }}</a>
-        ({{ tag.assets | length }} ассетов)
-    </li>
-{% endfor %}
-</ul>
+<div class="row g-2">
+    {% for tag in tags %}
+    <div class="col-auto">
+        <a href="{{ url_for('assets.assets_list', tag=tag.name) }}"
+           class="badge bg-secondary text-decoration-none p-2">
+            {{ tag.name }}
+            <span class="badge bg-light text-dark ms-1">{{ tag.assets | length }}</span>
+        </a>
+    </div>
+    {% else %}
+        <p>Тегов пока нет.</p>
+    {% endfor %}
+</div>
 {% endblock %}
